@@ -22,6 +22,7 @@ Or install it yourself as:
     $ rails g barkdata:install
 
 ### Configuration
+config/initializers/barkdata.rb
 ```ruby
 Barkdata.configure do
   Barkdata::Config.instance.project_name = 'barkbox'
