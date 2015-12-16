@@ -27,6 +27,7 @@ config/initializers/barkdata.rb
 Barkdata.configure do
   Barkdata::Config.instance.project_name = 'barkbox'
   Barkdata::Config.instance.bucket = ENV['BARKDATA_BUCKET']
+  Barkdata::Config.instance.enabled = ['true', '1', true, 1].include?(ENV['BARKDATA_ENABLED'])
 
   Barkdata.register Subscription
   Barkdata.register User do

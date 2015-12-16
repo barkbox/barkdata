@@ -18,7 +18,7 @@ module Barkdata
   end
 
   def self.enabled?
-    ['true', '1', true, 1].include?(ENV['ENABLE_BARKDATA_CHANGECAPTURE'])
+    Barkdata::Config.instance.enabled
   end
 
   def self.register(class_name, &block)

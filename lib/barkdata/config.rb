@@ -5,12 +5,13 @@ module Barkdata
   class Config
     include Singleton
 
-    attr_accessor :registered_objects, :project_name, :bucket
+    attr_accessor :registered_objects, :project_name, :bucket, :enabled
 
     def initialize
       @registered_objects = {}
       @project_name = ENV['BARKDATA_PROJECT_NAME'] || 'unknown'
       @bucket = ENV['BARKDATA_BUCKET'] || 'unknown-bucket'
+      @enabled = false
       super
     end
 
