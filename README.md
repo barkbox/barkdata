@@ -21,7 +21,12 @@ Or install it yourself as:
 ### Installation
     $ rails g barkdata:install
 
+### Requirements
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+
 ### Configuration
+
 config/initializers/barkdata.rb
 ```ruby
 Barkdata.configure do
