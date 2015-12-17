@@ -7,7 +7,7 @@ module Barkdata
 
     def self.enable model
       unless Barkdata.enabled?
-        Rails.logger.info "Barkdata.register SKIP if ENABLE_BARKDATA_CHANGECAPTURE is not set to true."
+        Rails.logger.info "Barkdata.register SKIP. BarkData not enabled."
         return
       end
       Rails.logger.info "Barkdata::Changelog.enable: #{model.table_name}"
