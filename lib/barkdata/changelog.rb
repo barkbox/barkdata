@@ -44,8 +44,7 @@ module Barkdata
     def self.archive_to_s3
       @project_name = Barkdata::Config.instance.project_name
       latest_change_id = self.get_latest_change_id
-      time_prefix = Time.now.utc.strftime("%Y-%m-%d-%H-%M-%S")
-      tmp_filepath = "/tmp/barkdata-changelog-#{@project_name}-#{time_prefix}.csv.gz"
+
       query_array = [
         [
           "COPY ( select *,",
@@ -63,15 +62,30 @@ module Barkdata
       raw_connection.exec(sanitized_query)
       row_count = 0
 
-      File.open(tmp_filepath, "wb") do |file|
-        gz = Zlib::GzipWriter.new(file)
-        while row = raw_connection.get_copy_data
-          row_count += 1
-          Rails.logger.info "Barkdata::Changelog.archive_to_s3: #{row_count} rows dumped." if row_count % 10000 == 0
-          gz << row
+      extracted_files = []
+      time_prefix = Time.now.utc.strftime("%Y-%m-%d-%H-%M-%S")
+      file_part = 1
+      tmp_filepath = "/tmp/barkdata-changelog-#{@project_name}-#{time_prefix}-part#{file_part.to_s.rjust(4, '0')}.csv.gz"
+      extracted_files << tmp_filepath
+      file = File.open(tmp_filepath, "wb")
+      gz = Zlib::GzipWriter.new(file)
+      header = nil
+      while row = raw_connection.get_copy_data
+        row_count += 1
+        Rails.logger.info "Barkdata::Changelog.archive_to_s3: #{row_count} rows dumped." if row_count % 10000 == 0
+        header ||= row
+        gz << row
+        if row_count > Barkdata::Config.instance.file_row_limit
+          gz.close
+          file_part += 1
+          tmp_filepath = "/tmp/barkdata-changelog-#{@project_name}-#{time_prefix}-part#{file_part.to_s.rjust(3, '0')}.csv.gz"
+          extracted_files << tmp_filepath
+          file = File.open(tmp_filepath, "wb")
+          gz = Zlib::GzipWriter.new(file)
+          gz << header
         end
-        gz.close
       end
+      gz.close
       s3_key = Barkdata::S3.upload(tmp_filepath, "internal_data/barkdata_changelog/extracted/#{@project_name}")
       self.mark_as_archived(latest_change_id)
       File.delete(tmp_filepath)
