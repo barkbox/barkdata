@@ -61,6 +61,7 @@ module Barkdata
       raw_connection = ActiveRecord::Base.connection.raw_connection
       raw_connection.exec(sanitized_query)
       row_count = 0
+      file_row_count = 0
 
       extracted_files = []
       time_prefix = Time.now.utc.strftime("%Y-%m-%d-%H-%M-%S")
@@ -72,10 +73,12 @@ module Barkdata
       header = nil
       while row = raw_connection.get_copy_data
         row_count += 1
+        file_row_count += 1
         Rails.logger.info "Barkdata::Changelog.archive_to_s3: #{row_count} rows dumped." if row_count % 10000 == 0
         header ||= row
         gz << row
-        if row_count > Barkdata::Config.instance.file_row_limit
+        if file_row_count > Barkdata::Config.instance.file_row_limit
+          file_row_count = 0
           gz.close
           file_part += 1
           tmp_filepath = "/tmp/barkdata-changelog-#{@project_name}-#{time_prefix}-part#{file_part.to_s.rjust(3, '0')}.csv.gz"
@@ -87,14 +90,14 @@ module Barkdata
       end
       gz.close
 
-      s3_key = nil
+      s3_keys = []
       extracted_files.each do |filepath|
-        s3_key = Barkdata::S3.upload(filepath, "internal_data/barkdata_changelog/extracted/#{@project_name}")
+        s3_keys << Barkdata::S3.upload(filepath, "internal_data/barkdata_changelog/extracted/#{@project_name}")
         File.delete(filepath)
       end
       self.mark_as_archived(latest_change_id)
       Rails.logger.info "Barkdata::Changelog.archive_to_s3: Finished. Dumped #{row_count} total rows in changelog."
-      s3_key
+      s3_keys
     end
 
     def self.cleanup_archived_rows
