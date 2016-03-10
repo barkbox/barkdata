@@ -81,7 +81,7 @@ module Barkdata
           file_row_count = 0
           gz.close
           file_part += 1
-          tmp_filepath = "/tmp/barkdata-changelog-#{@project_name}-#{time_prefix}-part#{file_part.to_s.rjust(3, '0')}.csv.gz"
+          tmp_filepath = "/tmp/barkdata-changelog-#{@project_name}-#{time_prefix}-part#{file_part.to_s.rjust(4, '0')}.csv.gz"
           extracted_files << tmp_filepath
           file = File.open(tmp_filepath, "wb")
           gz = Zlib::GzipWriter.new(file)
