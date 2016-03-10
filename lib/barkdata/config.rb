@@ -12,7 +12,7 @@ module Barkdata
       @project_name = ENV['BARKDATA_PROJECT_NAME'] || 'unknown'
       @bucket = ENV['BARKDATA_BUCKET'] || 'unknown-bucket'
       @enabled = false
-      @file_row_limit = (ENV['BARKDATA_FILE_ROW_LIMIT'] || 50000).to_i
+      @file_row_limit = (ENV['BARKDATA_FILE_ROW_LIMIT'] || 100000).to_i
       super
     end
 
