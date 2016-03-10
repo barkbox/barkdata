@@ -86,9 +86,13 @@ module Barkdata
         end
       end
       gz.close
-      s3_key = Barkdata::S3.upload(tmp_filepath, "internal_data/barkdata_changelog/extracted/#{@project_name}")
+
+      s3_key = nil
+      extracted_files.each do |filepath|
+        s3_key = Barkdata::S3.upload(filepath, "internal_data/barkdata_changelog/extracted/#{@project_name}")
+        File.delete(filepath)
+      end
       self.mark_as_archived(latest_change_id)
-      File.delete(tmp_filepath)
       Rails.logger.info "Barkdata::Changelog.archive_to_s3: Finished. Dumped #{row_count} total rows in changelog."
       s3_key
     end
