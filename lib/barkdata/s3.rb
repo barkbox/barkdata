@@ -11,6 +11,7 @@ module Barkdata
       prefix ||= "internal_data/barkdata_uncategorized/extracted/#{@project_name}"
       s3_key = [ prefix, File.basename(filepath) ].join('/')
       Rails.logger.info "Barkdata::S3.upload filepath=#{filepath.inspect} to " +
+                        "bucket_name=#{@bucket_name.inspect} " +
                         "s3_key=#{s3_key.inspect}"
       s3 = Aws::S3::Client.new({
         access_key_id: ENV['AWS_ACCESS_KEY_ID'],
@@ -23,6 +24,7 @@ module Barkdata
       file.close
       Rails.logger.info "Barkdata::S3.upload Finished uploading " +
                         "filepath=#{filepath.inspect} to " +
+                        "bucket_name=#{@bucket_name.inspect} " +
                         "s3_key=#{s3_key.inspect}"
       return s3_key
     end
