@@ -62,6 +62,7 @@ module Barkdata
       raw_connection.exec(sanitized_query)
       row_count = 0
       file_row_count = 0
+      Rails.logger.info "Barkdata::Changelog.archive_to_s3: start latest_change_id=#{latest_change_id.inspect}."
 
       extracted_files = []
       time_prefix = Time.now.utc.strftime("%Y-%m-%d-%H-%M-%S")
@@ -113,11 +114,11 @@ module Barkdata
 
     def self.get_latest_change_id
       query_array = [
-        "SELECT max(change_id) as max_change_id FROM barkdata.changelog WHERE archived = false"
+        "SELECT min(change_id) as min_change_id FROM barkdata.changelog WHERE archived = false"
       ]
       sanitized_query = ActiveRecord::Base.send(:sanitize_sql_array, query_array)
       results = ActiveRecord::Base.connection.select_all(sanitized_query)
-      results.first.try(:[], 'max_change_id').to_i
+      results.first.try(:[], 'min_change_id').to_i + (Barkdata::Config.instance.file_row_limit * 5)
     end
 
     def self.mark_as_archived change_id=nil
