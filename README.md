@@ -5,7 +5,7 @@
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'barkdata', github: 'barkbox/barkdata', tag: '0.2.4'
+gem 'barkdata', github: 'barkbox/barkdata', tag: '0.2.5'
 ```
 
 And then execute:
