@@ -118,7 +118,10 @@ module Barkdata
       ]
       sanitized_query = ActiveRecord::Base.send(:sanitize_sql_array, query_array)
       results = ActiveRecord::Base.connection.select_all(sanitized_query)
-      results.first.try(:[], 'min_change_id').to_i + (Barkdata::Config.instance.file_row_limit * 5)
+      start_change_id = results.first.try(:[], 'min_change_id').to_i
+      end_change_id = start_change_id + (Barkdata::Config.instance.file_row_limit * 5)
+      Rails.logger.info "Barkdata::Changelog.archive_to_s3: start_change_id=#{start_change_id.inspect} end_change_id=#{end_change_id.inspect}"
+      end_change_id
     end
 
     def self.mark_as_archived change_id=nil
