@@ -1,5 +1,7 @@
 # Barkdata
 
+This gem creates a Postgres event triggers on any ActiveRecord model. Anytime there is a create, read, update, or delete operation an entry gets outputted into the `barkdata.changelog` table.  
+
 ## Installation
 
 Add this line to your application's Gemfile:
