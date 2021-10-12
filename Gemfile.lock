@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    barkdata (0.2.5)
+    barkdata (0.2.6)
       aws-sdk-s3 (~> 1)
       rails
 
